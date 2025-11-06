@@ -14,7 +14,7 @@ if (typeof window !== 'undefined' && window.supabase) {
 // Global configuration object
 let hallTicketConfig = {
     schoolName: "GLOBAL'S SANMARG PUBLIC SCHOOL BIDAR",
-    schoolSubtitle: "English Medium School With Shiksha-E-Hind and IIT Foundation Course",
+    schoolSubtitle: "English Medium School With Shoba-E-Hifz and IIT Foundation Course",
     schoolAddress: "Main Branch: Pansal Talleem  Bidar           Branch: Near City Palace", 
     examTitle: "Marks Card Annual Exam (2020-21)",
     schoolLogo: "images/logo.jpg", // Default logo path
