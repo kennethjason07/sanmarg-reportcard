@@ -90,9 +90,11 @@ async function fetchStudentsFromDatabase(selectedYear, classId = null, examId = 
             throw new Error(`No students found for academic year ${currentYear}. Check console for details.`);
         }
         
-        // Fetch parent information for all students using student_id
-        const studentIdsForParents = students.map(s => s.id);
+        // Fetch parent information using TWO methods for maximum compatibility
         let parents = [];
+
+        // PRIMARY METHOD: Fetch by student_id (modern approach)
+        const studentIdsForParents = students.map(s => s.id);
         if (studentIdsForParents.length > 0) {
             const { data: parentsData, error: parentsError } = await supabase
                 .from('parents')
@@ -101,12 +103,34 @@ async function fetchStudentsFromDatabase(selectedYear, classId = null, examId = 
                 .in('student_id', studentIdsForParents);
 
             if (parentsError) {
-                console.warn('Error fetching parents:', parentsError);
+                console.warn('⚠️ Error fetching parents by student_id:', parentsError);
             } else {
                 parents = parentsData || [];
-                console.log('📊 Parents fetched:', parents.length);
+                console.log('✅ Parents fetched by student_id:', parents.length);
             }
         }
+
+        // FALLBACK METHOD: Fetch by parent_id (legacy approach for backward compatibility)
+        const parentIds = students.filter(s => s.parent_id).map(s => s.parent_id);
+        if (parentIds.length > 0) {
+            const { data: parentsDataByParentId, error: parentsErrorByParentId } = await supabase
+                .from('parents')
+                .select('id, name, student_id, relation')
+                .eq('tenant_id', TENANT_ID)
+                .in('id', parentIds);
+
+            if (parentsErrorByParentId) {
+                console.warn('⚠️ Error fetching parents by parent_id:', parentsErrorByParentId);
+            } else if (parentsDataByParentId && parentsDataByParentId.length > 0) {
+                // Merge with existing parents (avoid duplicates)
+                const existingParentIds = new Set(parents.map(p => p.id));
+                const newParents = parentsDataByParentId.filter(p => !existingParentIds.has(p.id));
+                parents = [...parents, ...newParents];
+                console.log('✅ Additional parents fetched by parent_id:', newParents.length);
+            }
+        }
+
+        console.log('📊 Total parents fetched:', parents.length);
         
         // Get class IDs for fetching exams
         const classIds = [...new Set(students.map(s => s.class_id))];
@@ -316,13 +340,26 @@ function processStudentData(students, parents, exams, subjects, marks, currentYe
     console.log('🔄 Processing student data...');
 
     // Create lookup maps for better performance
-    // Map parents by student_id (not parent.id)
-    const parentsMap = {};
+    // Map parents by BOTH student_id AND parent.id for maximum compatibility
+    const parentsByStudentId = {};
+    const parentsById = {};
+
     parents.forEach(parent => {
-        if (!parentsMap[parent.student_id]) {
-            parentsMap[parent.student_id] = [];
+        // Map by student_id (for parents.student_id → students.id relationship)
+        if (parent.student_id) {
+            if (!parentsByStudentId[parent.student_id]) {
+                parentsByStudentId[parent.student_id] = [];
+            }
+            parentsByStudentId[parent.student_id].push(parent);
         }
-        parentsMap[parent.student_id].push(parent);
+
+        // Map by parent.id (for students.parent_id → parents.id relationship)
+        if (parent.id) {
+            if (!parentsById[parent.id]) {
+                parentsById[parent.id] = [];
+            }
+            parentsById[parent.id].push(parent);
+        }
     });
     
     const subjectsMap = {};
@@ -420,18 +457,35 @@ function processStudentData(students, parents, exams, subjects, marks, currentYe
             }
         });
         
-        // Get parent name (prioritize father, then any parent)
+        // Get parent name using BOTH linking methods (prioritize father, then any parent)
         let fatherName = '';
-        if (parentsMap[student.id]) {
-            const studentParents = parentsMap[student.id];
+        let studentParents = [];
+
+        // PRIMARY: Try to get parents by student_id (parents.student_id → students.id)
+        if (parentsByStudentId[student.id]) {
+            studentParents = parentsByStudentId[student.id];
+        }
+        // FALLBACK: Try to get parents by parent_id (students.parent_id → parents.id)
+        else if (student.parent_id && parentsById[student.parent_id]) {
+            studentParents = parentsById[student.parent_id];
+        }
+
+        // Now find the father from the student's parents
+        if (studentParents.length > 0) {
             // Look for father first
             const father = studentParents.find(p => p.relation === 'Father');
             if (father) {
                 fatherName = father.name;
-            } else if (studentParents.length > 0) {
-                // Use any available parent
+            } else {
+                // Use any available parent (Mother/Guardian)
                 fatherName = studentParents[0].name;
             }
+        }
+
+        if (fatherName) {
+            console.log(`✅ ${student.name}: Found father/parent - ${fatherName}`);
+        } else {
+            console.warn(`⚠️ ${student.name}: No parent found in database`);
         }
         
         console.log(`${student.name}: ${subjectNames.length} subjects, Father: ${fatherName}`);
@@ -1136,7 +1190,7 @@ function generateHallTicketHTML(student, index) {
                     <div class="student-right">
                         <div class="student-field">
                             <span class="field-label">FATHER NAME:</span>
-                            <span class="field-value">${student.fatherName || ''}</span>
+                            <span class="field-value">${student.fatherName || '____________'}</span>
                         </div>
                         <div class="student-field">
                             <span class="field-label">SECTION:</span>
