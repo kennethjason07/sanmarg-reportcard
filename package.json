@@ -1,0 +1,15 @@
+{
+  "name": "sanmarg-reportcard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx netlify dev",
+    "login": "npx netlify login",
+    "init": "npx netlify init",
+    "deploy": "npx netlify deploy --dir=. --prod",
+    "deploy:staging": "npx netlify deploy --dir=."
+  },
+  "devDependencies": {
+    "netlify-cli": "^16.0.0"
+  }
+}

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hall Ticket Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Hand+Cursive:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="simplified-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <h1>📋 Report Card Generator</h1>
+            <p>Generate professional report cards with ease</p>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+        <button class="nav-tab active" id="selectionTab">🏫 Select Class & Exam</button>
+        <button class="nav-tab" id="studentsTab" disabled>👥 Students</button>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="main-container">
+        
+        <!-- Tab 1: Class & Exam Selection -->
+        <div class="tab-content active" id="selectionContent">
+            <div class="selection-container">
+                <div class="selection-header">
+                    <h2>🎯 Select Class and Exam</h2>
+                    <p>Choose a class and exam to view students and generate report cards</p>
+                </div>
+                
+                <div class="selection-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="academicYearSelect">📅 Academic Year</label>
+                            <select id="academicYearSelect" class="form-select">
+                                <option value="">Loading academic years...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="classSelect">📚 Select Class</label>
+                            <select id="classSelect" class="form-select" disabled>
+                                <option value="">Select academic year first</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="examSelect">📋 Select Exam</label>
+                            <select id="examSelect" class="form-select" disabled>
+                                <option value="">Select class first</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="selection-actions">
+                        <button id="viewStudentsBtn" class="btn btn-primary" disabled>
+                            👥 View Students
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="loading-indicator" id="loadingIndicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading data...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Students List -->
+        <div class="tab-content" id="studentsContent">
+            <div class="students-container">
+                <div class="students-header">
+                    <h2 id="studentsTitle">👥 Students</h2>
+                    <button id="backToSelectionBtn" class="btn btn-secondary">← Back to Selection</button>
+                </div>
+                
+                <div class="students-grid" id="studentsGrid">
+                    <!-- Students will be loaded here -->
+                </div>
+                
+                <div class="no-students" id="noStudents" style="display: none;">
+                    <div class="no-data-icon">📚</div>
+                    <h3>No Students Found</h3>
+                    <p>No students found for the selected class and exam.</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="output"></div>
+
+    <template id="hallTicketTemplate">
+        <div class="hall-ticket">
+            <!-- Diamond Border Container -->
+            <div class="diamond-border-frame">
+                <!-- Watermark Background -->
+                <div class="watermark-container">
+                    <img src="images/logo.jpg" alt="School Logo" class="watermark-logo" id="templateWatermarkLogo">
+                </div>
+                
+                <!-- Header Section -->
+                <div class="hall-ticket-header">
+                    <div class="school-logo">
+                        <img src="images/logo.jpg" alt="School Logo" class="logo-img" id="templateHeaderLogo">
+                    </div>
+                    <div class="school-info">
+                        <h1 class="school-name">GLOBAL'S SANMARG PUBLIC SCHOOL BIDAR</h1>
+                        <p class="school-subtitle">English Medium School With Shiksha-E-Hind and IIT Foundation Course</p>
+                        <p class="school-address">Bidar, Karnataka, India</p>
+                        <h2 class="exam-title">Marks Card Annual Exam (2020-21)</h2>
+                    </div>
+                </div>
+
+                <!-- Student Information -->
+                <div class="student-info">
+                    <div class="student-left">
+                        <div class="student-field">
+                            <span class="field-label">STUDENT NAME:</span>
+                            <span class="field-value student-name"></span>
+                        </div>
+                        <div class="student-field">
+                            <span class="field-label">CLASS:</span>
+                            <span class="field-value class"></span>
+                        </div>
+                        <div class="student-field">
+                            <span class="field-label">ROLL NO:</span>
+                            <span class="field-value roll-no"></span>
+                        </div>
+                    </div>
+                    <div class="student-right">
+                        <div class="student-field">
+                            <span class="field-label">FATHER NAME:</span>
+                            <span class="field-value father-name"></span>
+                        </div>
+                        <div class="student-field">
+                            <span class="field-label">SECTION:</span>
+                            <span class="field-value section"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marks Table -->
+                <div class="marks-section">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>Subjects</th>
+                                <th>Max.Marks</th>
+                                <th>Min.Marks</th>
+                                <th>Marks Obt.</th>
+                                <th>Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mathematics</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="math-marks">66</td>
+                                <td class="math-remark"></td>
+                            </tr>
+                            <tr>
+                                <td>Science</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="science-marks">65</td>
+                                <td class="science-remark"></td>
+                            </tr>
+                            <tr>
+                                <td>Social</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="social-marks">55</td>
+                                <td class="social-remark"></td>
+                            </tr>
+                            <tr>
+                                <td>English</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="english-marks">66</td>
+                                <td class="english-remark"></td>
+                            </tr>
+                            <tr>
+                                <td>Kannada</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="kannada-marks">69</td>
+                                <td class="kannada-remark"></td>
+                            </tr>
+                            <tr>
+                                <td>Hindi/Urdu</td>
+                                <td>100</td>
+                                <td>35</td>
+                                <td class="hindi-marks">70</td>
+                                <td class="hindi-remark"></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Total</strong></td>
+                                <td><strong>600</strong></td>
+                                <td><strong>210</strong></td>
+                                <td class="total-marks"><strong>396</strong></td>
+                                <td></td>
+                            </tr>
+                            <tr class="percentage-row">
+                                <td><strong>Percentage</strong></td>
+                                <td colspan="3" class="percentage">66</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Grade</strong></td>
+                                <td colspan="3" class="grade">B</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Attendance Section -->
+                <div class="attendance-section">
+                    <h3 class="attendance-title">Attendance</h3>
+                    <span class="attendance-inline">
+                        <span class="attendance-label">Total Days:</span>
+                        <span class="attendance-value">______</span>
+                        <span class="attendance-label">Present:</span>
+                        <span class="attendance-value">______</span>
+                        <span class="attendance-label">Absent:</span>
+                        <span class="attendance-value">______</span>
+                    </span>
+                </div>
+
+                <!-- Co-Scholastic Areas -->
+                <div class="co-scholastic">
+                    <h3>Co-Scholastic Areas</h3>
+                    <div class="co-scholastic-grid">
+                        <div class="co-item">
+                            <span>1. Discipline in the classroom</span>
+                            <div class="grade-options">[ A / B / C ]</div>
+                        </div>
+                        <div class="co-item">
+                            <span>2. Behavior / Conduct with teachers & classmates</span>
+                            <div class="grade-options">[ A / B / C ]</div>
+                        </div>
+                        <div class="co-item">
+                            <span>3. Regularity & Neatness in doing HW/CW</span>
+                            <div class="grade-options">[ A / B / C ]</div>
+                        </div>
+                        <div class="co-item">
+                            <span>4. Comes to School: On time [ ] / Sometimes Late [ ] / Always Late [ ]</span>
+                            <div class="grade-options"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Signatures -->
+                <div class="signatures">
+                    <div class="signature-item">
+                        <div class="signature-line"></div>
+                        <strong>Parent Sign</strong>
+                    </div>
+                    <div class="signature-item">
+                        <div class="signature-line"></div>
+                        <strong>Class Teacher</strong>
+                    </div>
+                    <div class="signature-item">
+                        <div class="signature-line"></div>
+                        <strong>Academic Head</strong>
+                    </div>
+                </div>
+                
+                <div class="diamond-border-bottom"></div>
+            </div>
+
+            <!-- Download Section -->
+            <div class="download-section">
+                <button class="print-btn" onclick="printHallTicket(this)">🖨️ Print</button>
+                <button class="view-btn" onclick="viewHallTicket(this)">👁️ View PDF</button>
+                <button class="download-btn" onclick="downloadHallTicket(this)">📥 Download PDF</button>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+    
+</body>
+</html>

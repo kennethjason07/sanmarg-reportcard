@@ -1,0 +1,23 @@
+# Backup files
+*_backup.js
+*_backup.css
+
+# Test files
+test.html
+test_upload.html
+
+# Sample data
+sample_students.csv
+
+# Development files
+.vscode/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (if using)
+node_modules/
+# Local Netlify folder
+.netlify

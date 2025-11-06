@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(netlify --version:*)",
+      "Bash(netlify deploy:*)",
+      "Bash(netlify init:*)",
+      "Bash(netlify status:*)",
+      "Bash(netlify sites:create:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

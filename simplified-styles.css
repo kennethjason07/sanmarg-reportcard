@@ -1,0 +1,822 @@
+/* Simplified Report Card Generator Styles */
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Header Section */
+.header-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-content p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    background: white;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    position: relative;
+}
+
+.nav-tab:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.nav-tab:not(:disabled):hover {
+    color: #667eea;
+    background: #f8f9ff;
+}
+
+.nav-tab.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    background: #f8f9ff;
+}
+
+/* Main Container */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Selection Tab Styles */
+.selection-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.selection-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.selection-header h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.selection-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.selection-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e1e8ed;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-select:disabled {
+    background: #f8f9fa;
+    cursor: not-allowed;
+    color: #999;
+}
+
+.selection-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Students Tab Styles */
+.students-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    min-height: 500px;
+}
+
+.students-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.students-header h2 {
+    font-size: 1.75rem;
+    color: #333;
+    flex: 1;
+}
+
+/* Students Grid */
+.students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.student-card {
+    background: #f8f9ff;
+    border: 2px solid #e1e8ed;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.student-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.student-info {
+    margin-bottom: 1rem;
+}
+
+.student-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.student-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.roll-number,
+.father-name {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.roll-number {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.student-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.print-btn,
+.download-btn {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.print-btn {
+    background: linear-gradient(135deg, #6f42c1 0%, #563d7c 100%);
+    color: white;
+}
+
+.print-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(111, 66, 193, 0.3);
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Legacy support for old generate-btn class */
+.generate-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.generate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+/* No Students State */
+.no-students {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.no-data-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-students h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.no-students p {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Report Card Styles - Keep Original Design */
+.hall-ticket {
+    width: 700px;
+    max-width: 700px;
+    background: white;
+    margin: 0 auto 30px;
+    font-family: 'Times New Roman', Times, serif;
+    page-break-after: always;
+    page-break-inside: avoid;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.diamond-border-frame {
+    position: relative;
+    background: white;
+    margin: 14px;
+    padding: 22px;
+    border: 3px dotted #8B4513;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+/* Watermark Container */
+.watermark-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
+    width: 450px;
+    height: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.watermark-logo {
+    width: 450px;
+    height: 450px;
+    object-fit: contain;
+    opacity: 0.08;
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.hall-ticket-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    position: relative;
+    z-index: 2;
+}
+
+.school-logo {
+    margin-right: 17px;
+}
+
+.logo-img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    padding: 5px;
+    margin-left: 8px;
+}
+
+.school-info {
+    width: 550px;
+    text-align: center;
+    margin: 0 auto;
+    margin-left: -15px;
+}
+
+.school-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #000080;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.school-subtitle {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+}
+
+.school-address {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000;
+    margin: 0 0 15px 0;
+    white-space: pre;
+}
+
+.exam-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #d00;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.student-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.student-left, .student-right {
+    flex: 1;
+}
+
+.student-left {
+    margin-right: 30px;
+}
+
+.student-field {
+    margin: 8px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: baseline;
+}
+
+.field-label {
+    color: #d00;
+    font-weight: normal;
+    margin-right: 5px;
+    min-width: 100px;
+}
+
+.field-value {
+    color: #000080;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: cursive;
+}
+
+.marks-section {
+    margin: 20px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 0;
+}
+
+.marks-table th,
+.marks-table td {
+    border: 1px solid #000;
+    padding: 6px 8px;
+    text-align: center;
+}
+
+.marks-table th {
+    background-color: #ffcccc;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.marks-table td:first-child {
+    text-align: left;
+    font-weight: bold;
+    background-color: #fafafa;
+}
+
+.pass-remark {
+    color: #008000;
+    font-weight: bold;
+}
+
+.fail-remark {
+    color: #ff0000;
+    font-weight: bold;
+}
+
+.total-row td {
+    background-color: #ffcccc;
+    font-weight: bold;
+}
+
+.percentage-row td {
+    background-color: #e8e8ff;
+}
+
+.percentage {
+    color: #000080;
+    font-weight: bold;
+}
+
+.attendance-section {
+    margin: 15px 0;
+    padding: 10px;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.attendance-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    text-decoration: underline;
+    margin: 0 0 10px 0;
+    text-align: center;
+}
+
+.attendance-single-line {
+    display: inline-block;
+    font-size: 13px;
+}
+
+.attendance-label {
+    font-weight: bold;
+    color: #333;
+    margin-right: 5px;
+}
+
+.attendance-value {
+    color: #000;
+    padding: 0 2px;
+    margin-right: 15px;
+}
+
+.co-scholastic {
+    margin: 20px 0;
+    padding-top: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.co-scholastic h3 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 10px 0;
+    text-decoration: underline;
+}
+
+.co-scholastic-grid {
+    margin: 15px 0;
+}
+
+.co-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 6px 0;
+    font-size: 13px;
+}
+
+.co-item span {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.grade-options {
+    min-width: 120px;
+    text-align: center;
+    padding: 2px 5px;
+}
+
+.school-timing-options {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+
+.timing-option {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+}
+
+.signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.signature-item {
+    text-align: center;
+    flex: 1;
+    margin: 0 15px;
+}
+
+.signature-line {
+    height: 40px;
+    margin-bottom: 8px;
+}
+
+.signature-item strong {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .selection-container,
+    .students-container {
+        padding: 1.5rem;
+    }
+    
+    .students-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .students-header {
+        text-align: center;
+    }
+    
+    .students-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .header-content h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .nav-tabs,
+    .students-header,
+    .generate-btn {
+        display: none !important;
+    }
+    
+    .hall-ticket {
+        margin: 0;
+        box-shadow: none;
+        width: 100% !important;
+        max-width: 100% !important;
+        page-break-inside: avoid;
+    }
+    
+    .diamond-border-frame {
+        margin: 8px !important;
+        padding: 15px !important;
+        overflow: visible !important;
+    }
+    
+    .marks-table {
+        font-size: 11px !important;
+        width: 100% !important;
+    }
+    
+    .marks-table th,
+    .marks-table td {
+        padding: 3px 4px !important;
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .school-name {
+        font-size: 20px !important;
+    }
+    
+    .school-subtitle,
+    .school-address {
+        font-size: 13px !important;
+    }
+    
+    .exam-title {
+        font-size: 14px !important;
+    }
+    
+    .student-field {
+        font-size: 12px !important;
+    }
+    
+    .watermark-logo {
+        width: 400px !important;
+        height: 400px !important;
+    }
+    
+    @page {
+        margin: 0.3in;
+        size: A4 portrait;
+    }
+}
