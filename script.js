@@ -90,20 +90,21 @@ async function fetchStudentsFromDatabase(selectedYear, classId = null, examId = 
             throw new Error(`No students found for academic year ${currentYear}. Check console for details.`);
         }
         
-        // Fetch parent information for students who have parent_id
-        const parentIds = students.filter(s => s.parent_id).map(s => s.parent_id);
+        // Fetch parent information for all students using student_id
+        const studentIdsForParents = students.map(s => s.id);
         let parents = [];
-        if (parentIds.length > 0) {
+        if (studentIdsForParents.length > 0) {
             const { data: parentsData, error: parentsError } = await supabase
                 .from('parents')
                 .select('id, name, student_id, relation')
                 .eq('tenant_id', TENANT_ID)
-                .in('id', parentIds);
-                
+                .in('student_id', studentIdsForParents);
+
             if (parentsError) {
                 console.warn('Error fetching parents:', parentsError);
             } else {
                 parents = parentsData || [];
+                console.log('📊 Parents fetched:', parents.length);
             }
         }
         
@@ -313,14 +314,15 @@ async function fetchStudentsFromDatabase(selectedYear, classId = null, examId = 
 
 function processStudentData(students, parents, exams, subjects, marks, currentYear) {
     console.log('🔄 Processing student data...');
-    
+
     // Create lookup maps for better performance
+    // Map parents by student_id (not parent.id)
     const parentsMap = {};
     parents.forEach(parent => {
-        if (!parentsMap[parent.id]) {
-            parentsMap[parent.id] = [];
+        if (!parentsMap[parent.student_id]) {
+            parentsMap[parent.student_id] = [];
         }
-        parentsMap[parent.id].push(parent);
+        parentsMap[parent.student_id].push(parent);
     });
     
     const subjectsMap = {};
@@ -420,8 +422,8 @@ function processStudentData(students, parents, exams, subjects, marks, currentYe
         
         // Get parent name (prioritize father, then any parent)
         let fatherName = '';
-        if (student.parent_id && parentsMap[student.parent_id]) {
-            const studentParents = parentsMap[student.parent_id];
+        if (parentsMap[student.id]) {
+            const studentParents = parentsMap[student.id];
             // Look for father first
             const father = studentParents.find(p => p.relation === 'Father');
             if (father) {
@@ -1134,7 +1136,7 @@ function generateHallTicketHTML(student, index) {
                     <div class="student-right">
                         <div class="student-field">
                             <span class="field-label">FATHER NAME:</span>
-                            <span class="field-value">${student.fatherName || 'SYED ZAHIR'}</span>
+                            <span class="field-value">${student.fatherName || ''}</span>
                         </div>
                         <div class="student-field">
                             <span class="field-label">SECTION:</span>
