@@ -1117,7 +1117,11 @@ function generateHallTicketHTML(student, index) {
         return sum + (isAbsent ? 0 : (subject.marks || 0));
     }, 0);
     const actualMaxMarks = studentSubjects.reduce((sum, subject) => sum + (subject.maxMarks || 0), 0);
-    const actualMinMarks = studentSubjects.length * hallTicketConfig.minMarks;
+    // Calculate actual minimum marks based on each subject's max marks
+    const actualMinMarks = studentSubjects.reduce((sum, subject) => {
+        const minMarks = getMinMarks(subject.maxMarks || hallTicketConfig.maxMarks);
+        return sum + minMarks;
+    }, 0);
     
     const percentage = actualMaxMarks > 0 ? ((totalObtained / actualMaxMarks) * 100).toFixed(1) : '0.0';
     const grade = getGrade(percentage);
@@ -1127,6 +1131,9 @@ function generateHallTicketHTML(student, index) {
         // Check if marks is 'ab' (absent) or -1
         const isAbsent = (typeof subject.marks === 'string' && subject.marks.toLowerCase() === 'ab') || subject.marks === -1;
 
+        // Calculate min marks based on max marks for this subject
+        const subjectMinMarks = getMinMarks(subject.maxMarks || hallTicketConfig.maxMarks);
+
         let marksDisplay, remark, remarkClass;
 
         if (isAbsent) {
@@ -1135,7 +1142,8 @@ function generateHallTicketHTML(student, index) {
             remarkClass = 'fail-remark';
         } else {
             marksDisplay = subject.marks || 0;
-            remark = getRemark(subject.marks || 0, hallTicketConfig.minMarks);
+            // Use subject-specific min marks for remark calculation
+            remark = getRemark(subject.marks || 0, subjectMinMarks);
             remarkClass = remark === 'Pass' ? 'pass-remark' : 'fail-remark';
         }
 
@@ -1143,7 +1151,7 @@ function generateHallTicketHTML(student, index) {
         <tr>
             <td>${subject.name}</td>
             <td>${subject.maxMarks || hallTicketConfig.maxMarks}</td>
-            <td>${hallTicketConfig.minMarks}</td>
+            <td>${subjectMinMarks}</td>
             <td class="${subject.className}-marks" style="font-weight: bold;">${marksDisplay}</td>
             <td class="${subject.className}-remark ${remarkClass}">${remark}</td>
         </tr>`;
@@ -1292,6 +1300,21 @@ function generateHallTicketHTML(student, index) {
             </div>
         </div>
     `;
+}
+
+function getMinMarks(maxMarks) {
+    // Calculate minimum marks based on max marks
+    // For 50 max marks → 18 min marks (36%)
+    // For 100 max marks → 35 min marks (35%)
+    const max = parseInt(maxMarks) || 100;
+    if (max === 50) {
+        return 18;
+    } else if (max === 100) {
+        return 35;
+    } else {
+        // For other max marks, use 35% as minimum
+        return Math.ceil(max * 0.35);
+    }
 }
 
 function getRemark(obtained, minimum) {
